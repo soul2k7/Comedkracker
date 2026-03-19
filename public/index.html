@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMEDKracker — Expert COMEDK College Counselling</title>
+  <meta name="description" content="#1 COMEDK college counselling service. We help students find the best engineering college for their rank. 5000+ students placed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ══════════════════════════════════════════
+       ROOT TOKENS
+    ══════════════════════════════════════════ */
+    :root {
+      --ink:       #06111F;
+      --ink-mid:   #0D1F38;
+      --ink-card:  #0F2040;
+      --gold:      #D4991A;
+      --gold-lt:   #F0B93A;
+      --gold-dim:  rgba(212,153,26,0.15);
+      --gold-line: rgba(212,153,26,0.25);
+      --cream:     #F2EDE4;
+      --muted:     #6B7D96;
+      --white:     #FFFFFF;
+      --success:   #22C55E;
+      --error:     #EF4444;
+      --r:         14px;
+      --r-sm:      8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--ink);
+      color: var(--cream);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed; pointer-events: none;
+      z-index: 9999; transform: translate(-50%,-50%);
+      transition: transform 0.08s, width 0.2s, height 0.2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      position: fixed; pointer-events: none;
+      z-index: 9998; transform: translate(-50%,-50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.5;
+    }
+    body:hover .cursor { width: 10px; height: 10px; }
+    a:hover ~ .cursor, button:hover ~ .cursor { transform: translate(-50%,-50%) scale(2); }
+
+    /* Selection */
+    ::selection { background: var(--gold); color: var(--ink); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--ink); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 5%;
+      background: rgba(6,17,31,0.8);
+      backdrop-filter: blur(20px) saturate(1.5);
+      border-bottom: 1px solid var(--gold-line);
+      transition: padding 0.3s;
+    }
+    nav.scrolled { padding: 0.7rem 5%; }
+
+    .logo-mark {
+      display: flex; align-items: center; gap: 0.7rem;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: var(--ink);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem; font-weight: 700;
+      color: var(--white); letter-spacing: -0.3px;
+    }
+    .logo-text em { color: var(--gold); font-style: normal; }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.8px;
+      color: var(--muted); text-decoration: none;
+      text-transform: uppercase; transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1.5px; background: var(--gold);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--cream); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      background: var(--gold); color: var(--ink);
+      padding: 0.55rem 1.3rem; border-radius: var(--r-sm);
+      font-weight: 700; font-size: 0.82rem; letter-spacing: 0.5px;
+      text-transform: uppercase; text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold-lt); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,153,26,0.4); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; background: none; border: none; padding: 4px;
+    }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cream); border-radius: 2px; transition: 0.3s; }
+
+    /* Mobile nav drawer */
+    .mobile-drawer {
+      display: none; position: fixed; inset: 0; z-index: 850;
+      background: rgba(6,17,31,0.97); backdrop-filter: blur(24px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 2.2rem;
+    }
+    .mobile-drawer.open { display: flex; animation: drawerIn 0.35s ease; }
+    @keyframes drawerIn { from{opacity:0;transform:scale(0.97);} to{opacity:1;transform:scale(1);} }
+    .drawer-close {
+      position: absolute; top: 1.4rem; right: 5%;
+      background: none; border: none; color: var(--cream);
+      font-size: 1.8rem; cursor: pointer; line-height: 1;
+    }
+    .mobile-drawer a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-style: italic;
+      color: var(--cream); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-drawer a:hover { color: var(--gold); }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 9rem 5% 6rem;
+      position: relative; overflow: hidden;
+    }
+
+    /* Animated gradient orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); pointer-events: none;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(212,153,26,0.07); top: -100px; right: -100px; animation: drift1 12s ease-in-out infinite; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(212,153,26,0.05); bottom: 0; left: -80px; animation: drift2 14s ease-in-out infinite; }
+    @keyframes drift1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,30px);} }
+    @keyframes drift2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(30px,-30px);} }
+
+    /* Dot-grid texture */
+    .dot-grid {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(212,153,26,0.12) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 10%, transparent 80%);
+    }
+
+    .hero-inner { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; width: 100%; max-width: 1300px; }
+
+    .hero-left {}
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--gold-dim); border: 1px solid var(--gold-line);
+      padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
+      animation: fadeUp 0.8s ease both;
+    }
+    .pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 5.5vw, 5.2rem);
+      line-height: 1.05; color: var(--white);
+      margin-bottom: 1.6rem;
+      animation: fadeUp 0.9s 0.15s ease both;
+    }
+    h1 em { color: var(--gold); font-style: italic; }
+
+    .hero-desc {
+      font-size: 1.05rem; line-height: 1.8; color: var(--muted);
+      max-width: 500px; margin-bottom: 2.6rem;
+      animation: fadeUp 0.9s 0.3s ease both;
+    }
+
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.9s 0.45s ease both; }
+
+    .btn-gold {
+      background: var(--gold); color: var(--ink);
+      padding: 0.9rem 2rem; border-radius: var(--r-sm);
+      font-weight: 700; font-size: 0.92rem;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.25s; border: none; cursor: pointer;
+    }
+    .btn-gold:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(212,153,26,0.4); }
+
+    .btn-ghost {
+      border: 1.5px solid var(--gold-line); color: var(--cream);
+      padding: 0.9rem 2rem; border-radius: var(--r-sm);
+      font-weight: 500; font-size: 0.92rem;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.25s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    /* Hero right — stat cards */
+    .hero-right {
+      display: flex; flex-direction: column; gap: 1.2rem;
+      animation: fadeUp 0.9s 0.5s ease both;
+    }
+
+    .stat-card {
+      background: var(--ink-card);
+      border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 1.6rem 2rem;
+      display: flex; align-items: center; gap: 1.4rem;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--gold-dim) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .stat-card:hover { transform: translateX(6px); border-color: rgba(212,153,26,0.5); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-icon { font-size: 2rem; flex-shrink: 0; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 700; color: var(--gold); line-height: 1; }
+    .stat-lbl { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+      animation: fadeIn 1s 1.2s ease both;
+    }
+    .scroll-arrow {
+      width: 20px; height: 32px; border: 1.5px solid var(--gold-line);
+      border-radius: 12px; position: relative;
+    }
+    .scroll-arrow::after {
+      content: ''; position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; background: var(--gold); border-radius: 50%;
+      animation: scrollPulse 1.5s infinite;
+    }
+    @keyframes scrollPulse { 0%{top:5px;opacity:1;} 100%{top:18px;opacity:0;} }
+
+    /* ══════════════════════════════════════════
+       MARQUEE STRIP
+    ══════════════════════════════════════════ */
+    .marquee-strip {
+      background: var(--gold);
+      padding: 0.85rem 0;
+      overflow: hidden; white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-flex; gap: 3rem;
+      animation: marquee 25s linear infinite;
+    }
+    .marquee-track span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--ink); letter-spacing: 1px; text-transform: uppercase;
+    }
+    .marquee-track .dot { color: rgba(6,17,31,0.4); }
+    @keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+    /* ══════════════════════════════════════════
+       SECTION BASE
+    ══════════════════════════════════════════ */
+    section { padding: 6rem 5%; }
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 2.5px; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .tag::before { content: ''; width: 20px; height: 1.5px; background: var(--gold); display: block; }
+
+    .section-h {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1; color: var(--white); margin-bottom: 0.8rem;
+    }
+    .section-h em { color: var(--gold); font-style: italic; }
+    .section-p { color: var(--muted); line-height: 1.8; max-width: 540px; }
+
+    /* ══════════════════════════════════════════
+       PROCESS / HOW IT WORKS
+    ══════════════════════════════════════════ */
+    #process { background: var(--ink-mid); }
+
+    .process-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem; margin-top: 3.5rem;
+    }
+
+    .process-card {
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 2.2rem;
+      position: relative; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .process-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+
+    .p-num {
+      font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 700;
+      color: var(--gold-dim); line-height: 1; margin-bottom: 0.8rem;
+      transition: color 0.3s;
+    }
+    .process-card:hover .p-num { color: rgba(212,153,26,0.25); }
+
+    .p-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+    .p-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 0.6rem; }
+    .p-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.75; }
+
+    /* Connector dots between steps */
+    .process-connector {
+      display: flex; align-items: center; justify-content: center;
+      align-self: center; color: var(--gold); font-size: 1.2rem;
+    }
+
+    /* Rank Checker */
+    .rank-checker {
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 2.5rem;
+      margin-top: 3rem; display: flex; align-items: center; justify-content: space-between;
+      gap: 2rem; flex-wrap: wrap;
+    }
+    .rank-checker-text h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--white); margin-bottom: 0.3rem; }
+    .rank-checker-text p { color: var(--muted); font-size: 0.9rem; }
+
+    .rc-form { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .rc-input {
+      padding: 0.75rem 1.2rem; border-radius: var(--r-sm);
+      background: rgba(255,255,255,0.05); border: 1.5px solid var(--gold-line);
+      color: var(--cream); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+      outline: none; width: 180px; transition: border-color 0.2s;
+    }
+    .rc-input:focus { border-color: var(--gold); }
+    .rc-input::placeholder { color: var(--muted); }
+
+    .rc-btn {
+      padding: 0.75rem 1.4rem; background: var(--gold); color: var(--ink);
+      border: none; border-radius: var(--r-sm); font-family: 'Outfit', sans-serif;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .rc-btn:hover { background: var(--gold-lt); }
+
+    .rc-result {
+      margin-top: 1rem; padding: 1rem 1.4rem;
+      border-radius: var(--r-sm); font-size: 0.9rem; line-height: 1.65;
+      display: none;
+    }
+    .rc-result.show { display: block; }
+    .rc-result.good { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--cream); }
+    .rc-result.ok { background: var(--gold-dim); border: 1px solid var(--gold-line); color: var(--cream); }
+    .rc-result.help { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: var(--cream); }
+
+    /* ══════════════════════════════════════════
+       SERVICES
+    ══════════════════════════════════════════ */
+    #services { background: var(--ink); }
+
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.4rem; margin-top: 3.5rem;
+    }
+
+    .svc-card {
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 2rem;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .svc-card.highlight { border-color: var(--gold); }
+    .svc-card.highlight::after {
+      content: 'Most Popular';
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: var(--gold); color: var(--ink);
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 100px;
+    }
+    .svc-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.35); border-color: rgba(212,153,26,0.45); }
+    .svc-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+    .svc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: var(--white); margin-bottom: 0.6rem; }
+    .svc-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.75; margin-bottom: 1.2rem; }
+    .svc-chip {
+      display: inline-block;
+      background: var(--gold-dim); border: 1px solid var(--gold-line);
+      color: var(--gold); font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px; padding: 0.25rem 0.7rem; border-radius: 100px;
+    }
+
+    /* ══════════════════════════════════════════
+       WHY US
+    ══════════════════════════════════════════ */
+    #why { background: var(--ink-mid); }
+
+    .why-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-top: 3.5rem; }
+    .why-left { display: flex; flex-direction: column; gap: 1.1rem; }
+    .why-right { display: flex; flex-direction: column; gap: 1.1rem; }
+
+    .why-item {
+      display: flex; gap: 1.1rem; padding: 1.4rem 1.6rem;
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); transition: all 0.3s; cursor: default;
+    }
+    .why-item:hover { border-color: rgba(212,153,26,0.5); transform: translateX(5px); }
+    .wi-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .wi-body h4 { color: var(--white); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .wi-body p { color: var(--muted); font-size: 0.85rem; line-height: 1.65; }
+
+    /* Big number feature */
+    .big-feat {
+      background: var(--gold); border-radius: var(--r);
+      padding: 2.5rem; color: var(--ink); text-align: center;
+    }
+    .big-feat .bf-num { font-family: 'Cormorant Garamond', serif; font-size: 5rem; font-weight: 700; line-height: 1; }
+    .big-feat .bf-lbl { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 0.5rem; }
+
+    /* ══════════════════════════════════════════
+       TESTIMONIALS
+    ══════════════════════════════════════════ */
+    #testimonials { background: var(--ink); }
+
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.4rem; margin-top: 3.5rem;
+    }
+
+    .testi-card {
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 2rem;
+      transition: all 0.3s;
+    }
+    .testi-card:hover { transform: translateY(-5px); box-shadow: 0 14px 42px rgba(0,0,0,0.3); }
+    .t-stars { color: var(--gold); font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 1rem; }
+    .t-quote {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 1.05rem; line-height: 1.75; color: var(--cream); margin-bottom: 1.6rem;
+    }
+    .t-author { display: flex; align-items: center; gap: 1rem; }
+    .t-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #8B5E0A);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-weight: 700;
+      color: var(--ink); font-size: 1.2rem; flex-shrink: 0;
+    }
+    .t-name { color: var(--white); font-weight: 600; font-size: 0.9rem; }
+    .t-meta { color: var(--gold); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
+
+    /* ══════════════════════════════════════════
+       CONTACT
+    ══════════════════════════════════════════ */
+    #contact { background: var(--ink-mid); }
+
+    .contact-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; margin-top: 3.5rem; }
+
+    .contact-left {}
+    .contact-left > p { color: var(--muted); line-height: 1.8; margin-bottom: 2.5rem; }
+
+    .c-info-item {
+      display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem;
+    }
+    .c-icon-wrap {
+      width: 42px; height: 42px; border-radius: var(--r-sm);
+      background: var(--gold-dim); border: 1px solid var(--gold-line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .c-detail label { display: block; font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.25rem; }
+    .c-detail span, .c-detail a { color: var(--cream); font-size: 0.93rem; text-decoration: none; transition: color 0.2s; }
+    .c-detail a:hover { color: var(--gold); }
+
+    .whatsapp-btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: #25D366; color: #fff;
+      padding: 0.75rem 1.5rem; border-radius: var(--r-sm);
+      font-weight: 700; font-size: 0.88rem; text-decoration: none;
+      margin-top: 1rem; transition: all 0.2s;
+    }
+    .whatsapp-btn:hover { background: #20bf5b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+
+    /* Form card */
+    .form-card {
+      background: var(--ink-card); border: 1px solid var(--gold-line);
+      border-radius: var(--r); padding: 2.5rem;
+    }
+    .form-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--white); margin-bottom: 1.8rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .fg { margin-bottom: 1.1rem; }
+    .fg label {
+      display: block; font-size: 0.72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 0.5rem;
+    }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 0.8rem 1rem;
+      background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-sm); color: var(--cream);
+      font-family: 'Outfit', sans-serif; font-size: 0.92rem;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus {
+      border-color: var(--gold); background: rgba(212,153,26,0.04);
+    }
+    .fg input.error, .fg select.error, .fg textarea.error { border-color: var(--error) !important; }
+    .fg select option { background: var(--ink-mid); }
+    .fg textarea { resize: vertical; min-height: 100px; }
+    .fg .err-msg { display: none; color: var(--error); font-size: 0.75rem; margin-top: 4px; }
+    .fg.has-error .err-msg { display: block; }
+
+    .consent-row { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1.4rem; }
+    .consent-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--gold); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    .consent-row label { font-size: 0.82rem; color: var(--muted); line-height: 1.6; cursor: pointer; }
+
+    .submit-wrap { position: relative; }
+    .submit-btn {
+      width: 100%; padding: 1rem 2rem;
+      background: var(--gold); color: var(--ink);
+      border: none; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: all 0.25s;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      letter-spacing: 0.3px;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(212,153,26,0.4); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(6,17,31,0.3);
+      border-top-color: var(--ink); border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .submit-btn.loading .btn-text { display: none; }
+    .submit-btn.loading .spinner { display: block; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* Alerts */
+    .form-alert {
+      display: none; padding: 1rem 1.2rem; border-radius: var(--r-sm);
+      font-size: 0.88rem; line-height: 1.6; margin-top: 1rem;
+    }
+    .form-alert.show { display: flex; align-items: flex-start; gap: 0.7rem; }
+    .form-alert.success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--success); }
+    .form-alert.error-alert { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--error); }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer { background: #040D19; padding: 4rem 5% 2rem; border-top: 1px solid var(--gold-line); }
+
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; gap: 3rem; margin-bottom: 3rem; }
+
+    .f-brand p { color: var(--muted); font-size: 0.88rem; line-height: 1.8; max-width: 280px; margin-top: 1rem; }
+
+    .f-col h5 {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .f-col ul { list-style: none; }
+    .f-col ul li { margin-bottom: 0.65rem; }
+    .f-col ul a { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+    .f-col ul a:hover { color: var(--cream); }
+
+    .f-bottom { border-top: 1px solid var(--gold-line); padding-top: 1.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .f-bottom p { color: var(--muted); font-size: 0.82rem; }
+    .f-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--gold); }
+
+    /* ══════════════════════════════════════════
+       SCROLL REVEAL
+    ══════════════════════════════════════════ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left { opacity: 0; transform: translateX(-28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: none; }
+
+    /* ══════════════════════════════════════════
+       KEYFRAMES
+    ══════════════════════════════════════════ */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media(max-width: 1100px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-right { flex-direction: row; flex-wrap: wrap; }
+      .stat-card { flex: 1; min-width: 200px; }
+      .why-layout { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media(max-width: 800px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .contact-layout { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media(max-width: 600px) {
+      section { padding: 4rem 4%; }
+      .hero-right { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .f-bottom { flex-direction: column; text-align: center; }
+      .rank-checker { flex-direction: column; }
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Mobile drawer -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <a href="#process" onclick="closeDrawer()">How It Works</a>
+  <a href="#services" onclick="closeDrawer()">Services</a>
+  <a href="#why" onclick="closeDrawer()">Why Us</a>
+  <a href="#testimonials" onclick="closeDrawer()">Reviews</a>
+  <a href="#contact" onclick="closeDrawer()">Contact Us</a>
+</div>
+
+<!-- ── NAV ── -->
+<nav id="mainNav">
+  <a href="#hero" class="logo-mark">
+    <div class="logo-icon">CK</div>
+    <span class="logo-text">COMEDK<em>racker</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#process">Process</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Start Counselling</a>
+  <button class="hamburger" onclick="openDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="dot-grid"></div>
+
+  <div class="hero-inner container">
+    <div class="hero-left">
+      <div class="pill"><span class="pill-dot"></span> #1 COMEDK Counsellors</div>
+      <h1>Turn Your COMEDK Rank Into Your <em>Dream College</em></h1>
+      <p class="hero-desc">We analyse years of cutoff data to find the best engineering college for your exact rank. Expert counselling, zero guesswork — 500+ success stories.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-gold">Get Counselling →</a>
+        <a href="#process" class="btn-ghost">See How It Works</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+          <div class="stat-num">500+</div>
+          <div class="stat-lbl">Students Successfully Placed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏛️</div>
+        <div>
+          <div class="stat-num">Top 30</div>
+          <div class="stat-lbl">Colleges in Our Database</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div>
+          <div class="stat-num">5+ Yrs</div>
+          <div class="stat-lbl">Cutoff Data Analysed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div>
+          <div class="stat-num">98%</div>
+          <div class="stat-lbl">Counselling Success Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-strip">
+  <div class="marquee-track" id="marqueeTrack">
+    <span>COMEDK Counselling</span><span class="dot">◆</span>
+    <span>Rank-Based College Matching</span><span class="dot">◆</span>
+    <span>Choice Filling Assistance</span><span class="dot">◆</span>
+    <span>Cutoff Analysis</span><span class="dot">◆</span>
+    <span>500+ Students Placed</span><span class="dot">◆</span>
+    <span>Expert Counsellors</span><span class="dot">◆</span>
+    
+    <span>Best Consultation</span><span class="dot">◆</span>
+    <!-- duplicate for seamless loop -->
+    <span>COMEDK Counselling</span><span class="dot">◆</span>
+    <span>Rank-Based College Matching</span><span class="dot">◆</span>
+    <span>Choice Filling Assistance</span><span class="dot">◆</span>
+    <span>Cutoff Analysis</span><span class="dot">◆</span>
+    <span>5000+ Students Placed</span><span class="dot">◆</span>
+    <span>Expert Counsellors</span><span class="dot">◆</span>
+    
+    <span>Best Consultation</span><span class="dot">◆</span>
+  </div>
+</div>
+
+<!-- ── PROCESS ── -->
+<section id="process">
+  <div class="container">
+    <div class="reveal">
+      <div class="tag">The Process</div>
+      <h2 class="section-h">From Rank to Right College — <em>3 Clear Steps</em></h2>
+      <p class="section-p">Our streamlined counselling process ensures you never miss out on the best college for your rank. No confusion, just expert-guided clarity.</p>
+    </div>
+
+    <div class="process-grid reveal">
+      <div class="process-card">
+        <div class="p-num">01</div>
+        <div class="p-icon">📋</div>
+        <h3 class="p-title">Share Your Rank & Preferences</h3>
+        <p class="p-desc">Tell us your COMEDK rank, preferred branch, location choice, and fee budget. We build a personalised profile to guide your counselling session.</p>
+      </div>
+      <div class="process-card">
+        <div class="p-num">02</div>
+        <div class="p-icon">🔍</div>
+        <h3 class="p-title">Deep Analysis & Shortlisting</h3>
+        <p class="p-desc">Our experts dive into 5+ years of cutoff history, placement records, NAAC ratings, and campus infrastructure to shortlist your best-fit colleges.</p>
+      </div>
+      <div class="process-card">
+        <div class="p-num">03</div>
+        <div class="p-icon">🎓</div>
+        <h3 class="p-title">Guided Choice Filling & Allotment</h3>
+        <p class="p-desc">We walk you through every step of COMEDK's online choice filling, strategically ordering colleges to maximise your chances of a top allotment.</p>
+      </div>
+    </div>
+
+    <!-- Rank Checker Tool -->
+    <div class="rank-checker reveal">
+      <div class="rank-checker-text">
+        <h3>⚡ Quick Rank Prospect Checker</h3>
+        <p>Enter your COMEDK rank for an instant assessment of your college prospects</p>
+      </div>
+      <div style="flex:1; min-width:260px;">
+        <div class="rc-form">
+          <input type="number" class="rc-input" id="rcInput" placeholder="e.g. 12500" min="1" max="200000" />
+          <button class="rc-btn" onclick="checkRank()">Check Now</button>
+        </div>
+        <div class="rc-result" id="rcResult"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section id="services">
+  <div class="container">
+    <div class="reveal">
+      <div class="tag">What We Offer</div>
+      <h2 class="section-h">Counselling Services <em>Built for COMEDK</em></h2>
+      <p class="section-p">From one-on-one expert sessions to live allotment support — we cover every step of your COMEDK counselling journey.</p>
+    </div>
+
+    <div class="services-grid reveal">
+      <div class="svc-card highlight">
+        <div class="svc-icon">🏆</div>
+        <h3 class="svc-title">1-on-1 Expert Counselling</h3>
+        <p class="svc-desc">A dedicated session with your personal counsellor who studies your rank, preferences, and profile to craft a tailored college strategy just for you.</p>
+        <span class="svc-chip">Personalised</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon">📊</div>
+        <h3 class="svc-title">Cutoff Analysis & Prediction</h3>
+        <p class="svc-desc">Access our proprietary 5-year cutoff database across all 200+ COMEDK colleges and branches. Know exactly where you stand before allotment day.</p>
+        <span class="svc-chip">Data-Driven</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon">📝</div>
+        <h3 class="svc-title">Choice Filling Assistance</h3>
+        <p class="svc-desc">The most critical step in the process. We guide you through filling choices in the COMEDK portal to maximise your chances of the best allotment.</p>
+        <span class="svc-chip">Critical Step</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon">🤝</div>
+        <h3 class="svc-title">Parent & Family Briefing</h3>
+        <p class="svc-desc">We brief parents on the complete COMEDK counselling process, fee structures, and what to expect — ensuring the whole family is aligned.</p>
+        <span class="svc-chip">Family Focused</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon">🔄</div>
+        <h3 class="svc-title">Multi-Round Support</h3>
+        <p class="svc-desc">We're with you through every allotment round — Round 1, Round 2, and Mop-Up — adjusting your strategy in real-time based on live results.</p>
+        <span class="svc-chip">End-to-End</span>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon">🗺️</div>
+        <h3 class="svc-title">College Verification Help</h3>
+        <p class="svc-desc">We help you verify shortlisted colleges — labs, hostel, placements, NAAC grade — so you make a fully informed, confident final decision.</p>
+        <span class="svc-chip">On-Ground</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY US ── -->
+<section id="why">
+  <div class="container">
+    <div class="reveal">
+      <div class="tag">Our Advantage</div>
+      <h2 class="section-h">Why Students Trust <em>COMEDKracker</em></h2>
+    </div>
+
+    <div class="why-layout">
+      <div class="why-left reveal-left">
+        <div class="big-feat">
+          <div class="bf-num">98%</div>
+          <div class="bf-lbl">Counselling Success Rate</div>
+        </div>
+        <div class="why-item">
+          <div class="wi-icon">📈</div>
+          <div class="wi-body">
+            <h4>5+ Years of Cutoff Data</h4>
+            <p>Comprehensive historical data across all 200+ colleges and every branch for accurate predictions.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="wi-icon">👨‍🏫</div>
+          <div class="wi-body">
+            <h4>Ex-Admission Officers on Team</h4>
+            <p>Our counsellors include former college admission officials who know the COMEDK process inside out.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="wi-icon">💰</div>
+          <div class="wi-body">
+            <h4>Zero College Commission</h4>
+            <p>We take zero commission from colleges. Our loyalty is 100% to you and your best outcome.</p>
+          </div>
+        </div>
+      </div>
+      <div class="why-right reveal-right">
+        <div class="why-item">
+          <div class="wi-icon">⚡</div>
+          <div class="wi-body">
+            <h4>Real-Time Allotment Updates</h4>
+            <p>During counselling season, we monitor live trends and help you adjust your choices instantly.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="wi-icon">🎯</div>
+          <div class="wi-body">
+            <h4>Rank-to-College Precision</h4>
+            <p>We've mapped thousands of ranks to outcomes. Our predictions are backed by real data, not guesses.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="wi-icon">📱</div>
+          <div class="wi-body">
+            <h4>WhatsApp Support During Season</h4>
+            <p>Direct access to your counsellor on WhatsApp during the entire COMEDK counselling period.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="wi-icon">🏅</div>
+          <div class="wi-body">
+            <h4>500+ Students Placed</h4>
+            <p>Our track record speaks for itself — thousands of students in top Karnataka engineering colleges.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials">
+  <div class="container">
+    <div class="reveal">
+      <div class="tag">Student Stories</div>
+      <h2 class="section-h">500+ Students <em>Can't Be Wrong</em></h2>
+      <p class="section-p">Hear from students who found their dream colleges with expert COMEDK counselling guidance.</p>
+    </div>
+
+    <div class="testi-grid reveal">
+      <div class="testi-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote">"With rank 18,000 I thought I'd be stuck with an unknown college. COMEDKracker's data analysis got me into BMSIT's CSE. Life-changing!"</p>
+        <div class="t-author">
+          <div class="t-avatar">A</div>
+          <div>
+            <div class="t-name">Aditya Sharma</div>
+            <div class="t-meta">Rank 18,240 → BMSIT CSE</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote">"The choice-filling session was a game-changer. I was about to fill choices randomly! The counsellor restructured my list — I got BMS ECE, my first choice."</p>
+        <div class="t-author">
+          <div class="t-avatar">P</div>
+          <div>
+            <div class="t-name">Priya Nair</div>
+            <div class="t-meta">Rank 7,580 → BMS College ECE</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="t-stars">★★★★★</div>
+        <p class="t-quote">"My parents were very anxious. The family briefing session cleared all our doubts instantly. The team is incredibly patient, thorough, and genuinely caring."</p>
+        <div class="t-author">
+          <div class="t-avatar">R</div>
+          <div>
+            <div class="t-name">Rohit Kulkarni</div>
+            <div class="t-meta">Rank 3,120 → MSRIT ECE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="container">
+    <div class="reveal">
+      <div class="tag">Contact Us</div>
+      <h2 class="section-h">Book Your <em> Consultation</em></h2>
+      <p class="section-p">Fill the form below and our counsellor will contact you within 24 hours. No obligation, completely free.</p>
+    </div>
+
+    <div class="contact-layout">
+      <!-- Left: info -->
+      <div class="contact-left reveal-left">
+        <p>Navigating COMEDK counselling can feel overwhelming. Our experts take the stress away and guide you to the college you deserve — based on data, not luck.</p>
+
+        <div class="c-info-item">
+          <div class="c-icon-wrap">📞</div>
+          <div class="c-detail">
+            <label>Phone / WhatsApp</label>
+            <span><a href="tel:+919876543210">+91 76518 10417</a></span>
+          </div>
+        </div>
+        <div class="c-info-item">
+          <div class="c-icon-wrap">✉️</div>
+          <div class="c-detail">
+            <label>Email</label>
+            <span><a href="mailto:comedkracker@gmail.com">comedkracker@gmail.com</a></span>
+          </div>
+        </div>
+
+        <div class="c-info-item">
+          <div class="c-icon-wrap">🕐</div>
+          <div class="c-detail">
+            <label>Working Hours</label>
+            <span>Monday – Saturday, 9 AM – 7 PM</span>
+          </div>
+        </div>
+
+        <a href="https://wa.me/917651810417" target="_blank" rel="noopener" class="whatsapp-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat on WhatsApp Now
+        </a>
+      </div>
+
+      <!-- Right: form -->
+      <div class="form-card reveal-right">
+        <h3>Send Us Your Enquiry</h3>
+
+        <div id="contactForm">
+          <div class="form-row">
+            <div class="fg" id="fg-fname">
+              <label>First Name *</label>
+              <input type="text" id="fname" placeholder="Ravi" autocomplete="given-name" />
+              <div class="err-msg">Please enter your first name.</div>
+            </div>
+            <div class="fg" id="fg-lname">
+              <label>Last Name *</label>
+              <input type="text" id="lname" placeholder="Sharma" autocomplete="family-name" />
+              <div class="err-msg">Please enter your last name.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg" id="fg-phone">
+              <label>Phone / WhatsApp *</label>
+              <input type="tel" id="phone" placeholder="+91 98765 43210" autocomplete="tel" />
+              <div class="err-msg">Please enter a valid 10-digit phone number.</div>
+            </div>
+            <div class="fg">
+              <label>Email Address</label>
+              <input type="email" id="email" placeholder="ravi@gmail.com" autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg" id="fg-rank">
+              <label>COMEDK Rank *</label>
+              <input type="number" id="rank" placeholder="e.g. 15000" min="1" max="200000" />
+              <div class="err-msg">Enter a valid rank (1–200000).</div>
+            </div>
+            <div class="fg">
+              <label>Preferred Branch</label>
+              <select id="branch">
+                <option value="">Select Branch</option>
+                <option>Computer Science (CSE)</option>
+                <option>Electronics & Communication (ECE)</option>
+                <option>Information Science (ISE)</option>
+                <option>Mechanical Engineering</option>
+                <option>Civil Engineering</option>
+                <option>Electrical Engineering (EEE)</option>
+                <option>Biotechnology</option>
+                <option>Chemical Engineering</option>
+                <option>Other / Flexible</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Your City</label>
+            <input type="text" id="city" placeholder="e.g. Bengaluru, Mysuru, Hubballi…" />
+          </div>
+
+          <div class="fg">
+            <label>Message / Specific Questions</label>
+            <textarea id="message" placeholder="Any preferences about college location, budget, hostel requirement, or specific colleges you're considering?"></textarea>
+          </div>
+
+          <div class="consent-row">
+            <input type="checkbox" id="consent" />
+            <label for="consent">I agree to be contacted by COMEDKracker regarding my counselling enquiry. My data will not be shared with third parties.</label>
+          </div>
+
+          <div class="submit-wrap">
+            <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+              <span class="btn-text">Send My Enquiry &nbsp;→</span>
+              <div class="spinner"></div>
+            </button>
+          </div>
+
+          <div class="form-alert success" id="alertSuccess">
+            <span>🎉</span>
+            <div><strong>Enquiry received!</strong> Our counsellor will contact you within 24 hours. Check your email for a confirmation.</div>
+          </div>
+          <div class="form-alert error-alert" id="alertError">
+            <span>⚠️</span>
+            <div id="alertErrorMsg">Something went wrong. Please try again or WhatsApp us directly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="f-brand">
+        <a href="#hero" class="logo-mark" style="text-decoration:none;">
+          <div class="logo-icon">CK</div>
+          <span class="logo-text">COMEDK<em>racker</em></span>
+        </a>
+        <p>Most trusted COMEDK college counselling service. We've helped 500+ students find their perfect engineering college since 2019.</p>
+      </div>
+      <div class="f-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="#services">1-on-1 Counselling</a></li>
+          <li><a href="#services">Cutoff Analysis</a></li>
+          <li><a href="#services">Choice Filling</a></li>
+          <li><a href="#services">Family Briefing</a></li>
+          <li><a href="#services">Multi-Round Support</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="#process">How It Works</a></li>
+          <li><a href="#why">Why Choose Us</a></li>
+          <li><a href="#testimonials">Student Stories</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h5>Get in Touch</h5>
+        <ul>
+          <li><a href="tel:+919876543210">+91 76518 10417</a></li>
+          <li><a href="mailto:comedkracker@gmail.com">comedkracker@gmail.com</a></li>
+          <li><a href="https://wa.me/917651810417">WhatsApp Us</a></li>
+         
+          <li><a href="#">Mon–Sat, 9AM – 7PM</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="f-bottom">
+      <p>© 2025 COMEDKracker. All rights reserved.</p>
+      <p class="f-mono">Empowering students — one rank at a time.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Custom cursor ── */
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    cursorRing.style.left = e.clientX + 'px';
+    cursorRing.style.top = e.clientY + 'px';
+  }, 60);
+});
+document.querySelectorAll('a,button,.process-card,.svc-card,.stat-card,.testi-card,.why-item').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; cursorRing.style.opacity = '0.2'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; cursorRing.style.opacity = '0.5'; });
+});
+
+/* ── Nav scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── Mobile drawer ── */
+function openDrawer() { document.getElementById('mobileDrawer').classList.add('open'); }
+function closeDrawer() { document.getElementById('mobileDrawer').classList.remove('open'); }
+
+/* ── Scroll reveal ── */
+const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const revObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), 80);
+      revObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+revealEls.forEach(el => revObserver.observe(el));
+
+/* ── Rank Checker ── */
+function checkRank() {
+  const val = parseInt(document.getElementById('rcInput').value);
+  const resultEl = document.getElementById('rcResult');
+  if (!val || val < 1) { resultEl.className = 'rc-result'; return; }
+
+  let cls, msg;
+  if (val <= 1000) {
+    cls = 'good'; msg = '🏅 <strong>Exceptional rank!</strong> You can target top-tier colleges like RV College, BMSCE, and PES University for CSE/ECE. You have excellent options — let us help you pick the best fit.';
+  } else if (val <= 3000) {
+    cls = 'good'; msg = '🎯 <strong>Excellent rank!</strong> Colleges like RV College, BMS College, MSRIT, and Nitte are well within reach. Branch strategy is key here — speak to us!';
+  } else if (val <= 8000) {
+    cls = 'good'; msg = '✅ <strong>Strong rank!</strong> Reputed colleges like DSCE, Dayananda Sagar, New Horizon, and Acharya are great options. Let us optimise your choice order.';
+  } else if (val <= 20000) {
+    cls = 'ok'; msg = '💡 <strong>Decent rank.</strong> Several good colleges are available including CMR, Jain University, and RNSIT. Smart choice-filling is crucial at this range — talk to us!';
+  } else if (val <= 50000) {
+    cls = 'ok'; msg = '📌 <strong>Strategy is everything at this rank.</strong> Expert guidance on choice ordering can make a big difference. Don\'t navigate this alone — book a session.';
+  } else {
+    cls = 'help'; msg = '🤝 <strong>Don\'t worry!</strong> There are accredited, NAAC-approved engineering colleges in Karnataka at this rank. Our counsellors will find the best-fit option for you.';
+  }
+
+  resultEl.innerHTML = msg;
+  resultEl.className = `rc-result show ${cls}`;
+}
+document.getElementById('rcInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkRank(); });
+
+/* ── Form validation helpers ── */
+function setError(id, show) {
+  const el = document.getElementById('fg-' + id);
+  if (!el) return;
+  el.classList.toggle('has-error', show);
+  const input = document.getElementById(id);
+  if (input) input.classList.toggle('error', show);
+}
+function clearErrors() { ['fname','lname','phone','rank'].forEach(id => setError(id, false)); }
+
+/* ── Contact form submit ── */
+async function submitForm() {
+  clearErrors();
+  document.getElementById('alertSuccess').classList.remove('show');
+  document.getElementById('alertError').classList.remove('show');
+
+  const firstName = document.getElementById('fname').value.trim();
+  const lastName  = document.getElementById('lname').value.trim();
+  const phone     = document.getElementById('phone').value.trim();
+  const email     = document.getElementById('email').value.trim();
+  const rank      = document.getElementById('rank').value.trim();
+  const branch    = document.getElementById('branch').value;
+  const city      = document.getElementById('city').value.trim();
+  const message   = document.getElementById('message').value.trim();
+  const consent   = document.getElementById('consent').checked;
+
+  // Validate
+  let hasError = false;
+  if (!firstName)                      { setError('fname', true); hasError = true; }
+  if (!lastName)                        { setError('lname', true); hasError = true; }
+  if (!phone || !/^\+?[\d\s\-]{8,15}$/.test(phone)) { setError('phone', true); hasError = true; }
+  if (!rank || isNaN(rank) || +rank < 1 || +rank > 200000) { setError('rank', true); hasError = true; }
+
+  if (!consent) {
+    document.getElementById('alertErrorMsg').textContent = 'Please check the consent box to submit.';
+    document.getElementById('alertError').classList.add('show');
+    return;
+  }
+  if (hasError) return;
+
+  // Show loading state
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, phone, email, rank, branch, city, message })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('alertSuccess').classList.add('show');
+      // Reset form fields
+      ['fname','lname','phone','email','rank','city','message'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('branch').selectedIndex = 0;
+      document.getElementById('consent').checked = false;
+      // Scroll to alert
+      document.getElementById('alertSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      document.getElementById('alertErrorMsg').textContent = data.message || 'Something went wrong. Please try again.';
+      document.getElementById('alertError').classList.add('show');
+    }
+  } catch (err) {
+    document.getElementById('alertErrorMsg').textContent = 'Network error. Please check your connection or WhatsApp us directly.';
+    document.getElementById('alertError').classList.add('show');
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
