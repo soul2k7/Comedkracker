@@ -1,6 +1,6 @@
 # COMEDKracker Website 🎓
 
-Karnataka's #1 COMEDK College Counselling website — with a **fully working contact form** that sends emails via Node.js + Nodemailer.
+#1 COMEDK College Counselling website — with a **fully working contact form** that sends emails via Node.js + Nodemailer.
 
 ---
 
