@@ -1,15 +1,14 @@
 require("dotenv").config();
 const express   = require("express");
-const nodemailer = require("nodemailer");
 const cors      = require("cors");
 const path      = require("path");
 const rateLimit = require("express-rate-limit");
+const https     = require("https");
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── FIX 1: Trust Railway/proxy headers ─────────────────────
-// Without this, express-rate-limit throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+// ── Trust Railway proxy ─────────────────────────────────────
 app.set("trust proxy", 1);
 
 // ── Middleware ──────────────────────────────────────────────
@@ -18,45 +17,69 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ── Health check ─────────────────────────────────────────────
+// ── Health check ────────────────────────────────────────────
 app.get("/health", (req, res) => {
   res.json({
-    status:        "ok",
-    emailUser:     process.env.EMAIL_USER     ? "SET ✅" : "MISSING ❌",
-    emailPass:     process.env.EMAIL_PASS     ? "SET ✅" : "MISSING ❌",
-    receiverEmail: process.env.RECEIVER_EMAIL ? "SET ✅" : "MISSING ❌",
+    status:   "ok",
+    resendKey: process.env.RESEND_API_KEY ? "SET ✅" : "MISSING ❌",
+    receiver:  process.env.RECEIVER_EMAIL ? "SET ✅" : "MISSING ❌",
+    senderEmail: process.env.SENDER_EMAIL ? "SET ✅" : "MISSING ❌",
   });
 });
 
-// ── Rate limiter ─────────────────────────────────────────────
+// ── Rate limiter ────────────────────────────────────────────
 const contactLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
   message: { success: false, message: "Too many submissions. Try again in an hour." },
 });
 
-// ── FIX 2: Use port 587 + STARTTLS explicitly ───────────────
-// Railway blocks port 465 (SSL). Port 587 with STARTTLS works fine.
-function makeTransporter() {
-  return nodemailer.createTransport({
-    host:   "smtp.gmail.com",
-    port:   587,
-    secure: false,          // false = STARTTLS (NOT SSL) — works on Railway
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,  // avoids cert issues on cloud servers
-    },
-    connectionTimeout: 15000,
-    greetingTimeout:   15000,
-    socketTimeout:     20000,
+// ── Send email via Resend HTTP API (no SMTP, works on Railway) ──
+function sendEmail({ to, subject, html, replyTo }) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      from:     process.env.SENDER_EMAIL || "COMEDKracker <onboarding@resend.dev>",
+      to:       [to],
+      subject,
+      html,
+      reply_to: replyTo || undefined,
+    });
+
+    const options = {
+      hostname: "api.resend.com",
+      path:     "/emails",
+      method:   "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type":  "application/json",
+        "Content-Length": Buffer.byteLength(body),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", chunk => { data += chunk; });
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(JSON.parse(data));
+        } else {
+          reject(new Error(`Resend API error ${res.statusCode}: ${data}`));
+        }
+      });
+    });
+
+    req.on("error", reject);
+    req.setTimeout(15000, () => {
+      req.destroy(new Error("Request to Resend API timed out"));
+    });
+
+    req.write(body);
+    req.end();
   });
 }
 
-// ── HTML email to business owner ─────────────────────────────
-function buildEmailHTML(d) {
+// ── HTML email to business owner ────────────────────────────
+function buildOwnerEmail(d) {
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"/>
 <style>
@@ -84,7 +107,7 @@ function buildEmailHTML(d) {
   <div class="bdy">
     <div class="badge">🔥 New Lead</div>
     <div class="row"><div class="lbl">Name</div><div class="val">${d.firstName} ${d.lastName}</div></div>
-    <div class="row"><div class="lbl">Phone / WhatsApp</div><div class="val"><a href="tel:${d.phone}" style="color:#0B1D3A">${d.phone}</a></div></div>
+    <div class="row"><div class="lbl">Phone / WhatsApp</div><div class="val">${d.phone}</div></div>
     <div class="row"><div class="lbl">Email</div><div class="val">${d.email || "Not provided"}</div></div>
     <div class="row"><div class="lbl">COMEDK Rank</div><div class="val rank">${d.rank}</div></div>
     <div class="row"><div class="lbl">Branch</div><div class="val">${d.branch || "Not specified"}</div></div>
@@ -94,12 +117,12 @@ function buildEmailHTML(d) {
       <div class="msgbox">${d.message || "No message."}</div>
     </div>
   </div>
-  <div class="ftr"><p>Sent via <strong style="color:#E8A020">COMEDKracker</strong> website contact form</p></div>
+  <div class="ftr"><p>Sent via <strong style="color:#E8A020">COMEDKracker</strong> website</p></div>
 </div></body></html>`;
 }
 
-// ── Auto-reply to student ─────────────────────────────────────
-function buildAutoReplyHTML(firstName, rank) {
+// ── Auto-reply to student ────────────────────────────────────
+function buildStudentEmail(firstName, rank) {
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"/>
 <style>
@@ -126,12 +149,12 @@ function buildAutoReplyHTML(firstName, rank) {
   </div>
   <div class="bdy">
     <div class="hi">Hi ${firstName}! 👋</div>
-    <p>Thank you for contacting <strong>COMEDKracker</strong>. We've received your enquiry and our expert counsellor will contact you within <strong>24 hours</strong>.</p>
+    <p>Thank you for contacting <strong>COMEDKracker</strong>. Our expert counsellor will reach out to you within <strong>24 hours</strong>.</p>
     <div class="rbox">
       <div class="rl">Your COMEDK Rank</div>
       <div class="rv">${rank}</div>
     </div>
-    <p>We've helped <strong>5,000+ students</strong> secure great engineering colleges. You're in great hands!</p>
+    <p>We've helped <strong>5,000+ students</strong> secure top engineering colleges. You're in great hands!</p>
     <a class="cta" href="https://wa.me/919876543210">💬 Chat on WhatsApp Now</a>
   </div>
   <div class="ftr">
@@ -140,18 +163,18 @@ function buildAutoReplyHTML(firstName, rank) {
 </div></body></html>`;
 }
 
-// ── POST /api/contact ─────────────────────────────────────────
+// ── POST /api/contact ────────────────────────────────────────
 app.post("/api/contact", contactLimiter, async (req, res) => {
   const { firstName, lastName, phone, email, rank, branch, city, message } = req.body;
 
   console.log("📩 Submission:", { firstName, lastName, phone, rank });
 
   // Guard: env vars
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ EMAIL_USER or EMAIL_PASS missing!");
+  if (!process.env.RESEND_API_KEY) {
+    console.error("❌ RESEND_API_KEY not set!");
     return res.status(500).json({
       success: false,
-      message: "Server email not configured. Please WhatsApp us at +91 98765 43210.",
+      message: "Server not configured. Please WhatsApp us at +91 98765 43210.",
     });
   }
 
@@ -170,69 +193,49 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
     });
   }
 
-  // Hard 25s timeout so form never hangs
-  const timer = setTimeout(() => {
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message: "Request timed out. Please WhatsApp us at +91 98765 43210.",
-      });
-    }
-  }, 25000);
-
   try {
-    const transporter = makeTransporter();
-
     // 1️⃣ Email to owner
-    await transporter.sendMail({
-      from:    `"COMEDKracker" <${process.env.EMAIL_USER}>`,
-      to:      process.env.RECEIVER_EMAIL || process.env.EMAIL_USER,
-      replyTo: email || undefined,
+    await sendEmail({
+      to:      process.env.RECEIVER_EMAIL || "hello@comedkracker.com",
       subject: `🎓 New Enquiry — ${firstName} ${lastName} | Rank: ${rank}`,
-      html:    buildEmailHTML({ firstName, lastName, phone, email, rank, branch, city, message }),
+      html:    buildOwnerEmail({ firstName, lastName, phone, email, rank, branch, city, message }),
+      replyTo: email || undefined,
     });
-    console.log("✅ Owner email sent");
+    console.log("✅ Owner email sent via Resend");
 
     // 2️⃣ Auto-reply to student
     if (email && email.includes("@")) {
-      await transporter.sendMail({
-        from:    `"COMEDKracker" <${process.env.EMAIL_USER}>`,
+      await sendEmail({
         to:      email,
         subject: `✅ Got your enquiry, ${firstName}! — COMEDKracker`,
-        html:    buildAutoReplyHTML(firstName, rank),
+        html:    buildStudentEmail(firstName, rank),
       });
       console.log("✅ Student reply sent to", email);
     }
 
-    clearTimeout(timer);
-    if (!res.headersSent) {
-      return res.json({
-        success: true,
-        message: "Enquiry sent! Our counsellor will contact you within 24 hours.",
-      });
-    }
+    return res.json({
+      success: true,
+      message: "Enquiry sent! Our counsellor will contact you within 24 hours.",
+    });
 
   } catch (err) {
-    clearTimeout(timer);
-    console.error("❌ Email error:", err.message);
-    if (!res.headersSent) {
-      return res.status(500).json({
-        success: false,
-        message: `Could not send email: ${err.message}. Please WhatsApp us at +91 98765 43210.`,
-      });
-    }
+    console.error("❌ Resend error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: `Could not send email: ${err.message}. Please WhatsApp us at +91 98765 43210.`,
+    });
   }
 });
 
-// ── Serve frontend ────────────────────────────────────────────
+// ── Serve frontend ───────────────────────────────────────────
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ── Start ─────────────────────────────────────────────────────
+// ── Start ────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🚀 COMEDKracker running on port ${PORT}`);
-  console.log(`   EMAIL_USER:     ${process.env.EMAIL_USER     || "❌ NOT SET"}`);
-  console.log(`   EMAIL_PASS:     ${process.env.EMAIL_PASS     ? "✅ set"    : "❌ NOT SET"}`);
-  console.log(`   RECEIVER_EMAIL: ${process.env.RECEIVER_EMAIL || "❌ NOT SET"}\n`);
+  console.log(`   RESEND_API_KEY: ${process.env.RESEND_API_KEY ? "✅ set"    : "❌ NOT SET"}`);
+  console.log(`   RECEIVER_EMAIL: ${process.env.RECEIVER_EMAIL || "❌ NOT SET"}`);
+  console.log(`   SENDER_EMAIL:   ${process.env.SENDER_EMAIL   || "using default onboarding@resend.dev"}\n`);
 });

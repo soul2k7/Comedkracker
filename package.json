@@ -1,7 +1,7 @@
 {
   "name": "comedkracker",
   "version": "1.0.0",
-  "description": "COMEDKracker - COMEDK College Counselling Website",
+  "description": "COMEDKracker — COMEDK College Counselling Website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,8 +11,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-rate-limit": "^7.3.1",
-    "nodemailer": "^6.9.14"
+    "express-rate-limit": "^7.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
