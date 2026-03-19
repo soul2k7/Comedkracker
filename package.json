@@ -1,3 +1,6 @@
+"scripts": {
+  "start": "node server.js"
+}
 {
   "name": "comedkracker",
   "version": "1.0.0",
