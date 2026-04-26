@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 
 module.exports = async function handler(req, res) {
-  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -10,25 +9,21 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const {
-    firstName,
-    lastName,
-    phone,
-    email,
-    rank,
-    branch,
-    city,
-    message,
-  } = req.body;
-
-  // Basic validation
-  if (!firstName || !phone || !rank) {
-    return res
-      .status(400)
-      .json({ error: "First name, phone, and rank are required." });
+  // ── Check env vars ──
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.error("MISSING ENV VARS: GMAIL_USER or GMAIL_APP_PASSWORD not set in Vercel.");
+    return res.status(500).json({
+      error:
+        "Email not configured. Add GMAIL_USER, GMAIL_APP_PASSWORD and RECIPIENT_EMAIL in Vercel → Settings → Environment Variables, then redeploy.",
+    });
   }
 
-  // Configure Gmail transporter
+  const { firstName, lastName, phone, email, rank, branch, city, message } = req.body || {};
+
+  if (!firstName || !phone || !rank) {
+    return res.status(400).json({ error: "First name, phone, and rank are required." });
+  }
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -43,7 +38,6 @@ module.exports = async function handler(req, res) {
     timeStyle: "short",
   });
 
-  // HTML email to the business owner
   const ownerMailOptions = {
     from: `"COMEDKracker Enquiries" <${process.env.GMAIL_USER}>`,
     to: process.env.RECIPIENT_EMAIL || process.env.GMAIL_USER,
@@ -51,17 +45,11 @@ module.exports = async function handler(req, res) {
     html: `
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>New Enquiry</title>
-</head>
+<head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#0f0f0f;font-family:'Segoe UI',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f0f;padding:40px 20px;">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="background:#1a1a1a;border-radius:16px;overflow:hidden;border:1px solid #2a2a2a;">
-
-        <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#1a1a1a 0%,#2d2416 100%);padding:36px 40px;border-bottom:2px solid #C9A84C;">
             <table width="100%" cellpadding="0" cellspacing="0">
@@ -78,18 +66,16 @@ module.exports = async function handler(req, res) {
             </table>
           </td>
         </tr>
-
-        <!-- Rank Badge -->
         <tr>
           <td style="padding:32px 40px 0;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#2d2416,#1f1a10);border:1px solid #C9A84C33;border-radius:12px;overflow:hidden;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#2d2416,#1f1a10);border:1px solid #C9A84C33;border-radius:12px;">
               <tr>
                 <td style="padding:24px 28px;">
                   <div style="font-size:11px;letter-spacing:2px;color:#C9A84C;text-transform:uppercase;font-weight:600;margin-bottom:4px;">COMEDK Rank</div>
                   <div style="font-size:42px;font-weight:800;color:#C9A84C;line-height:1;">${rank}</div>
                 </td>
                 <td style="padding:24px 28px;border-left:1px solid #C9A84C22;">
-                  <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;font-weight:600;margin-bottom:4px;">Preferred Branch</div>
+                  <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;font-weight:600;margin-bottom:4px;">Branch</div>
                   <div style="font-size:18px;font-weight:700;color:#ffffff;">${branch || "Not specified"}</div>
                 </td>
                 <td style="padding:24px 28px;border-left:1px solid #C9A84C22;">
@@ -100,8 +86,6 @@ module.exports = async function handler(req, res) {
             </table>
           </td>
         </tr>
-
-        <!-- Student Details -->
         <tr>
           <td style="padding:24px 40px 0;">
             <div style="font-size:11px;letter-spacing:2px;color:#C9A84C;text-transform:uppercase;font-weight:600;margin-bottom:16px;">Student Details</div>
@@ -117,23 +101,15 @@ module.exports = async function handler(req, res) {
                 </td>
               </tr>
               <tr>
-                <td width="50%" style="padding-bottom:16px;vertical-align:top;">
-                  <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Email Address</div>
+                <td width="50%" style="vertical-align:top;">
+                  <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Email</div>
                   <div style="font-size:16px;color:#ffffff;">${email || "Not provided"}</div>
-                </td>
-                <td width="50%" style="padding-bottom:16px;vertical-align:top;">
-                  <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">City</div>
-                  <div style="font-size:16px;color:#ffffff;">${city || "Not specified"}</div>
                 </td>
               </tr>
             </table>
           </td>
         </tr>
-
-        ${
-          message
-            ? `
-        <!-- Message -->
+        ${message ? `
         <tr>
           <td style="padding:0 40px;">
             <div style="background:#111;border-left:3px solid #C9A84C;border-radius:0 8px 8px 0;padding:20px 24px;margin-top:8px;">
@@ -141,38 +117,24 @@ module.exports = async function handler(req, res) {
               <div style="font-size:15px;color:#ccc;line-height:1.6;">${message}</div>
             </div>
           </td>
-        </tr>`
-            : ""
-        }
-
-        <!-- CTA -->
+        </tr>` : ""}
         <tr>
           <td style="padding:32px 40px;">
             <table cellpadding="0" cellspacing="0">
               <tr>
                 <td style="background:#C9A84C;border-radius:8px;padding:14px 28px;">
-                  <a href="https://wa.me/91${phone}" style="color:#0f0f0f;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:0.5px;">📱 WhatsApp ${firstName} Now</a>
+                  <a href="https://wa.me/91${phone}" style="color:#0f0f0f;text-decoration:none;font-size:14px;font-weight:700;">📱 WhatsApp ${firstName} Now</a>
                 </td>
-                ${
-                  email
-                    ? `<td width="16"></td>
-                <td style="border:1px solid #C9A84C33;border-radius:8px;padding:14px 28px;">
-                  <a href="mailto:${email}" style="color:#C9A84C;text-decoration:none;font-size:14px;font-weight:600;">✉️ Send Email</a>
-                </td>`
-                    : ""
-                }
+                ${email ? `<td width="16"></td><td style="border:1px solid #C9A84C33;border-radius:8px;padding:14px 28px;"><a href="mailto:${email}" style="color:#C9A84C;text-decoration:none;font-size:14px;font-weight:600;">✉️ Send Email</a></td>` : ""}
               </tr>
             </table>
           </td>
         </tr>
-
-        <!-- Footer -->
         <tr>
           <td style="background:#111;padding:20px 40px;border-top:1px solid #222;">
-            <div style="font-size:12px;color:#555;">This is an automated notification from <strong style="color:#C9A84C;">COMEDKracker</strong> contact form.</div>
+            <div style="font-size:12px;color:#555;">Automated notification from <strong style="color:#C9A84C;">COMEDKracker</strong> contact form.</div>
           </td>
         </tr>
-
       </table>
     </td></tr>
   </table>
@@ -180,16 +142,14 @@ module.exports = async function handler(req, res) {
 </html>`,
   };
 
-  // Auto-reply to student (only if email provided)
-  const studentMailOptions = email
-    ? {
-        from: `"COMEDKracker" <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: `We received your enquiry, ${firstName}! 🎓`,
-        html: `
+  const studentMailOptions = email ? {
+    from: `"COMEDKracker" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: `We received your enquiry, ${firstName}! 🎓`,
+    html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+<head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#f5f0e8;font-family:'Segoe UI',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f0e8;padding:40px 20px;">
     <tr><td align="center">
@@ -205,7 +165,7 @@ module.exports = async function handler(req, res) {
           <td style="padding:36px 40px;">
             <p style="font-size:16px;color:#333;margin:0 0 16px;">Hi <strong>${firstName}</strong>,</p>
             <p style="font-size:15px;color:#555;line-height:1.7;margin:0 0 24px;">
-              Thank you for reaching out to COMEDKracker! We've received your enquiry for <strong>COMEDK Rank ${rank}</strong> and our expert counsellor will contact you on <strong style="color:#C9A84C;">+91 ${phone}</strong> within 24 hours.
+              Thank you for reaching out to COMEDKracker! We received your enquiry for <strong>COMEDK Rank ${rank}</strong> and our counsellor will contact you on <strong style="color:#C9A84C;">+91 ${phone}</strong> within 24 hours.
             </p>
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f6f0;border-radius:12px;margin-bottom:28px;">
               <tr>
@@ -219,9 +179,6 @@ module.exports = async function handler(req, res) {
                 </td>
               </tr>
             </table>
-            <p style="font-size:14px;color:#777;line-height:1.6;margin:0 0 28px;">
-              In the meantime, you can WhatsApp us directly for any urgent queries. We're here Monday–Saturday, 9 AM – 7 PM.
-            </p>
             <table cellpadding="0" cellspacing="0">
               <tr>
                 <td style="background:#1a1a1a;border-radius:8px;padding:14px 28px;">
@@ -241,8 +198,7 @@ module.exports = async function handler(req, res) {
   </table>
 </body>
 </html>`,
-      }
-    : null;
+  } : null;
 
   try {
     await transporter.sendMail(ownerMailOptions);
@@ -251,7 +207,9 @@ module.exports = async function handler(req, res) {
     }
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Email send error:", err);
-    return res.status(500).json({ error: "Failed to send email." });
+    console.error("Nodemailer error:", err.message);
+    return res.status(500).json({
+      error: `Email failed: ${err.message}. Check your GMAIL_APP_PASSWORD in Vercel env vars.`,
+    });
   }
-}
+};
