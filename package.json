@@ -1,0 +1,12 @@
+{
+  "name": "comedkracker",
+  "version": "1.0.0",
+  "description": "COMEDKracker – Expert COMEDK College Counselling Website",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}
